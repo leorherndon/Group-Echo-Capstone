@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Schedule - UMGC Course Registration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: #667eea;
+        }
+
+        nav a.active {
+            color: #667eea;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: #667eea;
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after, nav a.active::after {
+            width: 100%;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        main {
+            padding: 2rem 0;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .schedule-controls {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .term-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .schedule-stats {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        select {
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .schedule-view {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+
+        .schedule-sidebar {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .enrolled-courses {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .course-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 4px solid #667eea;
+            position: relative;
+        }
+
+        .course-code {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 0.9rem;
+        }
+
+        .course-title {
+            font-weight: 600;
+            color: #333;
+            margin: 0.25rem 0;
+        }
+
+        .course-details {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .drop-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .drop-btn:hover {
+            background: #c82333;
+        }
+
+        .schedule-calendar {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .view-toggle {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 0.25rem;
+        }
+
+        .view-btn {
+            background: none;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .view-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: 80px repeat(7, 1fr);
+            gap: 1px;
+            background: #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .time-slot, .day-header, .calendar-cell {
+            background: white;
+            padding: 0.75rem 0.5rem;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .day-header {
+            font-weight: 600;
+            background: #f8f9fa;
+            min-height: 40px;
+        }
+
+        .time-slot {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 500;
+            background: #f8f9fa;
+            justify-content: flex-end;
+            padding-right: 1rem;
+        }
+
+        .calendar-cell {
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .calendar-cell:hover {
+            background: #f8f9fa;
+        }
+
+        .class-block {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 6px;
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .class-block:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .class-course {
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .class-location {
+            font-size: 0.7rem;
+            opacity: 0.9;
+        }
+
+        .list-view {
+            display: none;
+        }
+
+        .list-view.active {
+            display: block;
+        }
+
+        .calendar-view.hidden {
+            display: none;
+        }
+
+        .day-schedule {
+            margin-bottom: 2rem;
+        }
+
+        .day-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .day-classes {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .class-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .class-time {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 0.25rem;
+        }
+
+        .class-info {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert-success {
+            background-color: #d1edff;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .no-classes {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .user-info {
+                order: -1;
+            }
+
+            .schedule-controls {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .schedule-stats {
+                justify-content: space-around;
+            }
+
+            .schedule-view {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .calendar-grid {
+                grid-template-columns: 60px repeat(7, 1fr);
+                font-size: 0.8rem;
+            }
+
+            .time-slot, .day-header, .calendar-cell {
+                padding: 0.5rem 0.25rem;
+                min-height: 50px;
+            }
+
+            .class-block {
+                font-size: 0.65rem;
+                padding: 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="container">
+        <div class="header-content">
+            <div class="logo">UMGC Course Registration</div>
+            <nav>
+                <a href="courses.html">Courses</a>
+                <a href="schedule.html" class="active">My Schedule</a>
+                <a href="profile.html">Profile</a>
+            </nav>
+            <div class="user-info">
+                <span id="studentName">Loading...</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+        <div class="page-header">
+            <h1>My Schedule</h1>
+            <p>View and manage your enrolled courses</p>
+        </div>
+
+        <div id="alert" class="alert"></div>
+
+        <div class="schedule-controls">
+            <div class="term-selector">
+                <label for="termSelect">Term:</label>
+                <select id="termSelect">
+                    <option value="">Select Term</option>
+                </select>
+            </div>
+            <div class="schedule-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalCourses">0</div>
+                    <div class="stat-label">Courses</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalCredits">0</div>
+                    <div class="stat-label">Credits</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalHours">0</div>
+                    <div class="stat-label">Hours/Week</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="schedule-view">
+            <div class="schedule-sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-title">Enrolled Courses</div>
+                    <div class="enrolled-courses" id="enrolledCourses">
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                            <p>Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="schedule-calendar">
+                <div class="calendar-header">
+                    <h2>Weekly Schedule</h2>
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="switchView('calendar')">Calendar</button>
+                        <button class="view-btn" onclick="switchView('list')">List</button>
+                    </div>
+                </div>
+
+                <div id="calendarView" class="calendar-view">
+                    <div class="calendar-grid" id="calendarGrid">
+                        <!-- Calendar will be generated here -->
+                    </div>
+                </div>
+
+                <div id="listView" class="list-view">
+                    <!-- List view will be generated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const API_BASE_URL = 'http://localhost:8000/api';
+    let currentStudentId = null;
+    let currentSchedule = [];
+    let terms = [];
+
+    // Check authentication on page load
+    if (localStorage.getItem('isLoggedIn') !== 'true') {
+        window.location.href = 'index.html';
+    }
+
+    currentStudentId = localStorage.getItem('studentId');
+
+    async function initializePage() {
+        try {
+            await loadTerms();
+            if (terms.length > 0) {
+                document.getElementById('termSelect').value = terms[0].term_id;
+                await loadSchedule();
+            }
+        } catch (error) {
+            console.error('Error initializing page:', error);
+            showAlert('Error loading page data. Please refresh.', 'error');
+        }
+    }
+
+    async function loadTerms() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/courses/terms/`);
+            terms = await response.json();
+
+            const select = document.getElementById('termSelect');
+            select.innerHTML = '<option value="">Select Term</option>';
+            terms.forEach(term => {
+                const option = document.createElement('option');
+                option.value = term.term_id;
+                option.textContent = term.name;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading terms:', error);
+        }
+    }
+
+    async function loadSchedule() {
+        const termId = document.getElementById('termSelect').value;
+
+        if (!termId) {
+            currentSchedule = [];
+            renderSchedule();
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/registration/schedule/${currentStudentId}?term_id=${termId}`);
+            currentSchedule = await response.json();
+            renderSchedule();
+        } catch (error) {
+            console.error('Error loading schedule:', error);
+            showAlert('Error loading schedule. Please try again.', 'error');
+        }
+    }
+
+    function renderSchedule() {
+        renderSidebar();
+        renderCalendar();
+        renderListView();
+        updateStats();
+    }
+
+    function renderSidebar() {
+        const container = document.getElementById('enrolledCourses');
+
+        if (currentSchedule.length === 0) {
+            container.innerHTML = `
+                    <div class="no-classes">
+                        <p>No enrolled courses</p>
+                    </div>
+                `;
+            return;
+        }
+
+        const coursesHTML = currentSchedule.map(registration => `
+                <div class="course-item">
+                    <button class="drop-btn" onclick="dropCourse(${registration.registration_id}, '${registration.course_code}')">Drop</button>
+                    <div class="course-code">${registration.course_code}</div>
+                    <div class="course-title">${registration.course_title}</div>
+                    <div class="course-details">
+                        ${registration.credits} credits • ${registration.instructor_name}
+                        <br>Status: ${registration.status}
+                    </div>
+                </div>
+            `).join('');
+
+        container.innerHTML = coursesHTML;
+    }
+
+    function renderCalendar() {
+        const container = document.getElementById('calendarGrid');
+        const days = ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        const timeSlots = [
+            '8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'
+        ];
+
+        // Create header row
+        let gridHTML = days.map(day =>
+            day === '' ? '<div class="time-slot"></div>' : `<div class="day-header">${day}</div>`
+        ).join('');
+
+        // Create time slots and cells
+        timeSlots.forEach(time => {
+            gridHTML += `<div class="time-slot">${time}</div>`;
+
+            for (let day = 1; day <= 7; day++) {
+                const classes = getClassesForTimeSlot(day, time);
+                const cellHTML = classes.length > 0 ?
+                    classes.map(cls => `
+                            <div class="class-block" title="${cls.course_code} - ${cls.course_title}">
+                                <div class="class-course">${cls.course_code}</div>
+                                <div class="class-location">${cls.location}</div>
+                            </div>
+                        `).join('') : '';
+
+                gridHTML += `<div class="calendar-cell">${cellHTML}</div>`;
+            }
+        });
+
+        container.innerHTML = gridHTML;
+    }
+
+    function renderListView() {
+        const container = document.getElementById('listView');
+        const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+        let listHTML = '';
+
+        dayNames.forEach((dayName, dayIndex) => {
+            const dayNumber = dayIndex + 1;
+            const dayClasses = getDayClasses(dayNumber);
+
+            if (dayClasses.length > 0) {
+                listHTML += `
+                        <div class="day-schedule">
+                            <div class="day-title">${dayName}</div>
+                            <div class="day-classes">
+                                ${dayClasses.map(cls => `
+                                    <div class="class-card">
+                                        <div class="class-time">${cls.start_time} - ${cls.end_time}</div>
+                                        <div class="class-info">
+                                            <div>
+                                                <div class="course-title">${cls.course_code} - ${cls.course_title}</div>
+                                                <div class="course-details">${cls.instructor_name} • ${cls.location}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+            }
+        });
+
+        if (listHTML === '') {
+            listHTML = `
+                    <div class="no-classes">
+                        <h3>No classes scheduled</h3>
+                        <p>Your schedule is currently empty</p>
+                    </div>
+                `;
+        }
+
+        container.innerHTML = listHTML;
+    }
+
+    function getClassesForTimeSlot(dayOfWeek, timeSlot) {
+        const classes = [];
+
+        currentSchedule.forEach(registration => {
+            registration.meetings.forEach(meeting => {
+                if (meeting.day === getDayName(dayOfWeek)) {
+                    const startHour = parseInt(meeting.start_time.split(':')[0]);
+                    const slotHour = parseInt(timeSlot.split(':')[0]);
+
+                    if (startHour === slotHour) {
+                        classes.push({
+                            course_code: registration.course_code,
+                            course_title: registration.course_title,
+                            instructor_name: registration.instructor_name,
+                            location: meeting.location,
+                            start_time: meeting.start_time,
+                            end_time: meeting.end_time
+                        });
+                    }
+                }
+            });
+        });
+
+        return classes;
+    }
+
+    function getDayClasses(dayOfWeek) {
+        const classes = [];
+
+        currentSchedule.forEach(registration => {
+            registration.meetings.forEach(meeting => {
+                if (meeting.day === getDayName(dayOfWeek)) {
+                    classes.push({
+                        course_code: registration.course_code,
+                        course_title: registration.course_title,
+                        instructor_name: registration.instructor_name,
+                        location: meeting.location,
+                        start_time: meeting.start_time,
+                        end_time: meeting.end_time
+                    });
+                }
+            });
+        });
+
+        return classes.sort((a, b) => a.start_time.localeCompare(b.start_time));
+    }
+
+    function getDayName(dayNumber) {
+        const days = ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        return days[dayNumber];
+    }
+
+    function updateStats() {
+        const totalCourses = currentSchedule.length;
+        const totalCredits = currentSchedule.reduce((sum, reg) => sum + reg.credits, 0);
+
+        // Calculate total hours per week (assuming each meeting is the duration shown)
+        let totalHours = 0;
+        currentSchedule.forEach(registration => {
+            registration.meetings.forEach(meeting => {
+                const start = new Date(`2000-01-01 ${meeting.start_time}`);
+                const end = new Date(`2000-01-01 ${meeting.end_time}`);
+                const duration = (end - start) / (1000 * 60 * 60); // Convert to hours
+                totalHours += duration;
+            });
+        });
+
+        document.getElementById('totalCourses').textContent = totalCourses;
+        document.getElementById('totalCredits').textContent = totalCredits;
+        document.getElementById('totalHours').textContent = Math.round(totalHours * 10) / 10;
+    }
+
+    function switchView(view) {
+        const calendarView = document.getElementById('calendarView');
+        const listView = document.getElementById('listView');
+        const buttons = document.querySelectorAll('.view-btn');
+
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        if (view === 'calendar') {
+            calendarView.classList.remove('hidden');
+            listView.classList.remove('active');
+            document.querySelector('.view-btn:first-child').classList.add('active');
+        } else {
+            calendarView.classList.add('hidden');
+            listView.classList.add('active');
+            document.querySelector('.view-btn:last-child').classList.add('active');
+        }
+    }
+
+    async function dropCourse(registrationId, courseCode) {
+        if (!confirm(`Are you sure you want to drop ${courseCode}?`)) {
+            return;
+        }
+
+        try {
+            // Note: The API expects section_id, but we have registration_id
+            // We'll need to find the section_id from the current schedule
+            const registration = currentSchedule.find(reg => reg.registration_id === registrationId);
+
+            const response = await fetch(`${API_BASE_URL}/registration/drop`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    student_id: parseInt(currentStudentId),
+                    section_id: registration.section_id
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showAlert(`Successfully dropped ${courseCode}`, 'success');
+                await loadSchedule(); // Reload schedule
+            } else {
+                showAlert(data.detail || 'Failed to drop course', 'error');
+            }
+        } catch (error) {
+            console.error('Drop course error:', error);
+            showAlert('Network error. Please try again.', 'error');
+        }
+    }
+
+    function showAlert(message, type) {
+        const alert = document.getElementById('alert');
+        alert.textContent = message;
+        alert.className = `alert alert-${type}`;
+        alert.style.display = 'block';
+
+        setTimeout(() => {
+            alert.style.display = 'none';
+        }, 5000);
+    }
+
+    function logout() {
+        localStorage.removeItem('studentId');
+        localStorage.removeItem('isLoggedIn');
+        window.location.href = 'index.html';
+    }
+
+    // Event listeners
+    document.getElementById('termSelect').addEventListener('change', loadSchedule);
+
+    // Initialize page
+    document.getElementById('studentName').textContent = `Student #${currentStudentId}`;
+    initializePage();
+</script>
+</body>
+</html>

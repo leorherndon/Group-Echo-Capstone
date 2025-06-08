@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Catalog - UMGC Course Registration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: #667eea;
+        }
+
+        nav a.active {
+            color: #667eea;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: #667eea;
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after, nav a.active::after {
+            width: 100%;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        main {
+            padding: 2rem 0;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .search-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-filters {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        input, select {
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            height: fit-content;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .courses-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .course-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .course-code {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .course-credits {
+            background: #e9ecef;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .course-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .course-description {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .course-sections {
+            margin-bottom: 1rem;
+        }
+
+        .sections-header {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .section-item {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid #e9ecef;
+            font-size: 0.9rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-number {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .section-instructor {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .section-details {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .section-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .section-capacity {
+            font-weight: 600;
+        }
+
+        .capacity-available { color: #28a745; }
+        .capacity-limited { color: #ffc107; }
+        .capacity-full { color: #dc3545; }
+
+        .register-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .register-btn:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .register-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert-success {
+            background-color: #d1edff;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+
+        .no-courses {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .user-info {
+                order: -1;
+            }
+
+            .search-filters {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-details {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .section-info {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="container">
+        <div class="header-content">
+            <div class="logo">UMGC Course Registration</div>
+            <nav>
+                <a href="courses.html" class="active">Courses</a>
+                <a href="schedule.html">My Schedule</a>
+                <a href="profile.html">Profile</a>
+            </nav>
+            <div class="user-info">
+                <span id="studentName">Loading...</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+        <div class="page-header">
+            <h1>Course Catalog</h1>
+            <p>Browse and register for available courses</p>
+        </div>
+
+        <div id="alert" class="alert"></div>
+
+        <div class="search-section">
+            <div class="search-header">
+                <h2>Find Courses</h2>
+            </div>
+            <div class="search-filters">
+                <div class="filter-group">
+                    <label for="searchKeyword">Search</label>
+                    <input type="text" id="searchKeyword" placeholder="Course title, description, or number...">
+                </div>
+                <div class="filter-group">
+                    <label for="departmentFilter">Department</label>
+                    <select id="departmentFilter">
+                        <option value="">All Departments</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="termFilter">Term</label>
+                    <select id="termFilter">
+                        <option value="">Select Term</option>
+                    </select>
+                </div>
+                <button class="search-btn" onclick="searchCourses()">Search</button>
+            </div>
+        </div>
+
+        <div class="courses-section">
+            <div id="coursesContainer">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading courses...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const API_BASE_URL = 'http://localhost:8000/api';
+    let currentStudentId = null;
+    let departments = [];
+    let terms = [];
+    let courses = [];
+
+    // Check authentication on page load
+    if (localStorage.getItem('isLoggedIn') !== 'true') {
+        window.location.href = 'index.html';
+    }
+
+    currentStudentId = localStorage.getItem('studentId');
+
+    async function initializePage() {
+        try {
+            // Load departments and terms
+            await Promise.all([
+                loadDepartments(),
+                loadTerms()
+            ]);
+
+            // Load courses for default term if available
+            if (terms.length > 0) {
+                document.getElementById('termFilter').value = terms[0].term_id;
+                await loadCourses();
+            }
+        } catch (error) {
+            console.error('Error initializing page:', error);
+            showAlert('Error loading page data. Please refresh.', 'error');
+        }
+    }
+
+    async function loadDepartments() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/courses/departments`);
+            departments = await response.json();
+
+            const select = document.getElementById('departmentFilter');
+            departments.forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept.department_id;
+                option.textContent = `${dept.dept_code} - ${dept.name}`;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading departments:', error);
+        }
+    }
+
+    async function loadTerms() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/courses/terms/`);
+            terms = await response.json();
+
+            const select = document.getElementById('termFilter');
+            terms.forEach(term => {
+                const option = document.createElement('option');
+                option.value = term.term_id;
+                option.textContent = term.name;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading terms:', error);
+        }
+    }
+
+    async function loadCourses() {
+        const container = document.getElementById('coursesContainer');
+        container.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading courses...</p>
+                </div>
+            `;
+
+        try {
+            const termId = document.getElementById('termFilter').value;
+            const departmentId = document.getElementById('departmentFilter').value;
+            const search = document.getElementById('searchKeyword').value;
+
+            if (!termId) {
+                container.innerHTML = `
+                        <div class="no-courses">
+                            <h3>Please select a term to view courses</h3>
+                        </div>
+                    `;
+                return;
+            }
+
+            let url = `${API_BASE_URL}/courses/catalog/${termId}`;
+            const params = new URLSearchParams();
+
+            if (departmentId) params.append('department_id', departmentId);
+            if (search) params.append('search', search);
+
+            if (params.toString()) {
+                url += '?' + params.toString();
+            }
+
+            const response = await fetch(url);
+            courses = await response.json();
+
+            if (courses.length === 0) {
+                container.innerHTML = `
+                        <div class="no-courses">
+                            <h3>No courses found</h3>
+                            <p>Try adjusting your search criteria</p>
+                        </div>
+                    `;
+                return;
+            }
+
+            renderCourses(courses);
+        } catch (error) {
+            console.error('Error loading courses:', error);
+            container.innerHTML = `
+                    <div class="no-courses">
+                        <h3>Error loading courses</h3>
+                        <p>Please try again later</p>
+                    </div>
+                `;
+        }
+    }
+
+    function renderCourses(coursesToRender) {
+        const container = document.getElementById('coursesContainer');
+
+        const coursesHTML = coursesToRender.map(course => {
+            const sectionsHTML = course.sections.map(section => {
+                const capacityClass = section.available_seats > 10 ? 'capacity-available' :
+                    section.available_seats > 0 ? 'capacity-limited' : 'capacity-full';
+
+                const meetingsText = section.meetings.map(meeting =>
+                    `${meeting.day} ${meeting.start_time}-${meeting.end_time} (${meeting.building} ${meeting.room_number})`
+                ).join(', ');
+
+                return `
+                        <div class="section-item">
+                            <div class="section-header">
+                                <span class="section-number">Section ${section.section_number}</span>
+                                <span class="section-instructor">${section.instructor.first_name} ${section.instructor.last_name}</span>
+                            </div>
+                            <div class="section-details">
+                                <div class="section-info">
+                                    <span>${meetingsText || 'TBA'}</span>
+                                    <span class="section-capacity ${capacityClass}">
+                                        ${section.enrolled_count}/${section.capacity} enrolled
+                                        (${section.available_seats} available)
+                                    </span>
+                                </div>
+                                <button class="register-btn"
+                                    ${section.available_seats <= 0 ? 'disabled' : ''}
+                                    onclick="registerForSection(${section.section_id}, '${course.course_number}')">
+                                    ${section.available_seats <= 0 ? 'Full' : 'Register'}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+            }).join('');
+
+            return `
+                    <div class="course-card">
+                        <div class="course-header">
+                            <span class="course-code">${course.department.dept_code} ${course.course_number}</span>
+                            <span class="course-credits">${course.credits} credits</span>
+                        </div>
+                        <h3 class="course-title">${course.title}</h3>
+                        <p class="course-description">${course.description || 'No description available'}</p>
+                        <div class="course-sections">
+                            <div class="sections-header">Available Sections:</div>
+                            ${sectionsHTML}
+                        </div>
+                    </div>
+                `;
+        }).join('');
+
+        container.innerHTML = `<div class="courses-grid">${coursesHTML}</div>`;
+    }
+
+    async function registerForSection(sectionId, courseNumber) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/registration/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    student_id: parseInt(currentStudentId),
+                    section_id: sectionId
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showAlert(`Successfully ${data.status} for ${courseNumber}!`, 'success');
+                // Reload courses to update availability
+                await loadCourses();
+            } else {
+                showAlert(data.detail || 'Registration failed', 'error');
+            }
+        } catch (error) {
+            console.error('Registration error:', error);
+            showAlert('Network error. Please try again.', 'error');
+        }
+    }
+
+    function searchCourses() {
+        loadCourses();
+    }
+
+    function showAlert(message, type) {
+        const alert = document.getElementById('alert');
+        alert.textContent = message;
+        alert.className = `alert alert-${type}`;
+        alert.style.display = 'block';
+
+        setTimeout(() => {
+            alert.style.display = 'none';
+        }, 5000);
+    }
+
+    function logout() {
+        localStorage.removeItem('studentId');
+        localStorage.removeItem('isLoggedIn');
+        window.location.href = 'index.html';
+    }
+
+    // Event listeners
+    document.getElementById('searchKeyword').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchCourses();
+        }
+    });
+
+    document.getElementById('departmentFilter').addEventListener('change', searchCourses);
+    document.getElementById('termFilter').addEventListener('change', searchCourses);
+
+    // Initialize page
+    document.getElementById('studentName').textContent = `Student #${currentStudentId}`;
+    initializePage();
+</script>
+</body>
+</html>

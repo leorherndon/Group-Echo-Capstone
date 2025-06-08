@@ -1,0 +1,26 @@
+# Core FastAPI and server
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Database
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+
+# Authentication and security
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+
+# Data validation
+pydantic==2.5.0
+pydantic[email]==2.5.0
+
+# File upload support
+python-multipart==0.0.6
+
+# Additional useful packages
+python-dotenv==1.0.0  # For environment variables
+alembic==1.13.1       # For database migrations (optional)
+
+# Development tools (optional)
+pytest==7.4.3         # For testing
+httpx==0.25.2         # For testing async endpoints
