@@ -1,0 +1,29 @@
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy.orm import Session
+from models import Course, Department, Section, Term
+from database import SessionLocal
+
+router = APIRouter()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+@router.get("/courses")
+def get_courses(
+    dept_code: str = Query(None),
+    term_id: int = Query(None),
+    keyword: str = Query(None),
+    db: Session = Depends(get_db)
+):
+    # Query with joins, filtering, and keyword search
+    q = db.query(Course)
+    if dept_code:
+        q = q.join(Department).filter(Department.dept_code == dept_code)
+    if keyword:
+        q = q.filter(Course.title.ilike(f"%{keyword}%") | Course.description.ilike(f"%{keyword}%"))
+    results = q.all()
+    return [{"course_id": c.course_id, "title": c.title, "description": c.description, "credits": float(c.credits)} for c in results]

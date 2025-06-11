@@ -1,0 +1,27 @@
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from models import Registration, Section, Course
+from database import SessionLocal
+
+router = APIRouter()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+@router.get("/schedule")
+def get_schedule(student_id: int, db: Session = Depends(get_db)):
+    regs = db.query(Registration).filter_by(student_id=student_id, status='enrolled').all()
+    schedule = []
+    for reg in regs:
+        section = db.query(Section).filter_by(section_id=reg.section_id).first()
+        course = db.query(Course).filter_by(course_id=section.course_id).first()
+        schedule.append({
+            "course_id": course.course_id,
+            "title": course.title,
+            "section": section.section_number,
+        })
+    return schedule
